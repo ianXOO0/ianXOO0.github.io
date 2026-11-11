@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5B2EFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sigo Firme">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Sigo Firme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una columna para el celular. Cabecera fija con el botón SOS, cuatro vistas (Inicio, Ganas, Herramientas, Razones) y navegación inferior. El color fuerte (violeta a naranja) vive en la tarjeta del contador, el SOS y los botones principales. */
+:root{
+  --bg:#F4F0FF; --surface:#FFFFFF; --surface-2:#EAE3FF; --fg:#1B1038; --muted:#5E5380; --line:#D9CFFA;
+  --brand:#5B2EFF; --brand-fg:#FFFFFF; --brand-soft:#E6DEFF;
+  --sos:#E5195A; --sos-fg:#FFFFFF; --sos-soft:#FFE0EA;
+  --gold:#FFC93C; --gold-fg:#2B1B00; --mint:#0A9C85; --mint-soft:#D5F6EF;
+  --hero-a:#5B2EFF; --hero-b:#B02FD8; --hero-c:#FF6A3D; --hero-fg:#FFFFFF;
+  --f-display:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#120A2A; --surface:#1E1340; --surface-2:#291B55; --fg:#F2EEFF; --muted:#B5A9DE; --line:#3A2A73;
+    --brand:#9B7BFF; --brand-fg:#12062E; --brand-soft:#2D1F63;
+    --sos:#FF5C8A; --sos-fg:#2A0412; --sos-soft:#46142B;
+    --gold:#FFD25E; --gold-fg:#2B1B00; --mint:#3EDCC0; --mint-soft:#123C3A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#120A2A; --surface:#1E1340; --surface-2:#291B55; --fg:#F2EEFF; --muted:#B5A9DE; --line:#3A2A73;
+  --brand:#9B7BFF; --brand-fg:#12062E; --brand-soft:#2D1F63;
+  --sos:#FF5C8A; --sos-fg:#2A0412; --sos-soft:#46142B;
+  --gold:#FFD25E; --gold-fg:#2B1B00; --mint:#3EDCC0; --mint-soft:#123C3A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.12;margin:0}
+h2{font-size:1.7rem;font-weight:800}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+.wrap{max-width:600px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.4rem;display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;background:conic-gradient(from 200deg,var(--hero-a),var(--hero-b),var(--hero-c),var(--hero-a));flex:none;position:relative}
+.mark::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--bg)}
+main{display:grid;gap:16px;padding-block:18px 130px}
+section[data-view]{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:12px;min-width:0}
+.muted{color:var(--muted);font-size:.92rem}
+.eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+
+/* Tarjeta principal */
+.hero{border-radius:26px;padding:22px 20px 20px;color:var(--hero-fg);background:linear-gradient(135deg,var(--hero-a) 0%,var(--hero-b) 55%,var(--hero-c) 100%);display:grid;gap:14px;box-shadow:0 14px 34px -14px rgba(91,46,255,.65);position:relative;overflow:hidden;min-width:0}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.28),rgba(255,255,255,0) 70%);pointer-events:none}
+.hero .eyebrow{color:rgba(255,255,255,.85)}
+.days-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.days{font-family:var(--f-display);font-weight:800;font-size:6rem;line-height:.95;font-variant-numeric:tabular-nums}
+.days-word{font-family:var(--f-display);font-weight:700;font-size:1.7rem}
+.hero .sub{font-size:1rem;color:rgba(255,255,255,.92);font-weight:500}
+.progress{height:12px;border-radius:99px;background:rgba(255,255,255,.28);overflow:hidden}
+.progress>i{display:block;height:100%;border-radius:99px;background:var(--gold);width:0;transition:width .6s ease}
+.prog-label{display:flex;justify-content:space-between;gap:10px;font-size:.88rem;font-weight:600;color:rgba(255,255,255,.95)}
+.bar-dark{height:12px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar-dark>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--hero-a),var(--hero-c));width:0;transition:width .6s ease}
+
+/* Frase */
+.quote{border-radius:22px;padding:20px;background:var(--mint-soft);display:grid;gap:12px}
+.quote .q{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.25;text-wrap:balance}
+.quote .cat{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--mint)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{border-radius:18px;padding:16px;display:grid;gap:4px;min-width:0;background:var(--surface);border:1px solid var(--line)}
+.stat b{font-family:var(--f-display);font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.1}
+.stat.a b{color:var(--brand)}
+.stat.b b{color:var(--mint)}
+
+.miles{display:flex;flex-wrap:wrap;gap:8px}
+.mile{padding:8px 14px;border-radius:99px;font-weight:700;font-size:.9rem;background:var(--surface-2);color:var(--muted);border:1px dashed var(--line)}
+.mile.on{background:var(--gold);color:var(--gold-fg);border:1px solid var(--gold)}
+
+.btn{min-height:50px;padding:0 20px;border-radius:14px;border:2px solid transparent;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;gap:8px;color:var(--fg);background:transparent}
+.btn.primary{background:var(--brand);color:var(--brand-fg)}
+.btn.sos{background:var(--sos);color:var(--sos-fg)}
+.btn.ghost{border-color:var(--line);background:var(--surface)}
+.btn.light{background:rgba(255,255,255,.2);color:var(--hero-fg);border-color:rgba(255,255,255,.45)}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.btn-row>.btn{flex:1 1 150px}
+.sos-pill{min-height:44px;padding:0 20px;border-radius:999px;border:0;background:var(--sos);color:var(--sos-fg);font:inherit;font-weight:800;cursor:pointer;box-shadow:0 6px 16px -6px var(--sos)}
+.link{background:none;border:0;padding:8px 0;font:inherit;color:var(--muted);text-decoration:underline;cursor:pointer;justify-self:start}
+label{display:block;font-size:.875rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-height:46px}
+textarea{resize:vertical;min-height:80px}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+
+/* Ganas */
+.urge{border-radius:26px;padding:20px;color:var(--hero-fg);background:linear-gradient(160deg,var(--hero-a),var(--hero-b));display:grid;gap:14px;justify-items:center;text-align:center}
+.urge .orb-wrap{display:grid;place-items:center;height:230px}
+.orb{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--gold));color:var(--gold-fg);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.3rem;transform:scale(.7);transition:transform 4s ease-in-out;box-shadow:0 0 60px rgba(255,201,60,.6)}
+.orb.in{transform:scale(1.25)}
+.timer{font-family:var(--f-display);font-weight:800;font-size:3.6rem;font-variant-numeric:tabular-nums;line-height:1}
+.urge .btn-row{width:100%}
+.urge .note{color:rgba(255,255,255,.92)}
+.deter{font-family:var(--f-display);font-weight:700;font-size:1.3rem;line-height:1.3;min-height:5.2em}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks label{display:flex;align-items:center;gap:12px;margin:0;font-size:1rem;color:var(--fg);font-weight:500;min-height:46px;cursor:pointer}
+.checks input{width:24px;height:24px;min-height:0;flex:none;accent-color:var(--brand)}
+.reasons{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.reasons li{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--brand-soft);border-radius:14px;padding:12px 14px;font-weight:500}
+.reasons li span{min-width:0;overflow-wrap:anywhere}
+.reasons button{flex:none;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;cursor:pointer}
+.add-row{display:flex;gap:10px}
+.add-row input{flex:1;min-width:0}
+.warn{background:var(--sos-soft);border-radius:18px;padding:16px;display:grid;gap:10px}
+.note{font-size:.92rem;color:var(--muted);min-height:1.3em}
+
+/* Herramientas */
+.steps{margin:0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
+.steps li::before{content:counter(s);width:36px;height:36px;border-radius:50%;background:var(--brand);color:var(--brand-fg);display:grid;place-items:center;font-family:var(--f-display);font-weight:800}
+.list{margin:0;padding-left:20px;display:grid;gap:6px}
+.signs{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.signs li{background:var(--sos-soft);border-radius:12px;padding:10px 14px;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:42px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:.92rem;font-weight:600;cursor:pointer;text-align:left}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-fg)}
+.entries{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.entries li{background:var(--bg);border-radius:14px;padding:10px 12px;display:grid;gap:2px}
+.entries .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.entries button{min-height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer}
+.insight{background:var(--gold);color:var(--gold-fg);border-radius:14px;padding:12px 14px;font-weight:600}
+.phrase-item{border-radius:14px;padding:12px 14px;background:var(--bg);font-weight:500}
+.phrase-list{display:grid;gap:8px;max-height:360px;overflow:auto}
+details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+details .form{display:grid;gap:10px;padding-top:6px}
+
+nav.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:15;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.navbtn{background:none;border:0;min-height:60px;font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer;padding:0 2px}
+.navbtn[aria-current="page"]{color:var(--brand);box-shadow:inset 0 4px 0 var(--brand)}
+
+.overlay{position:fixed;inset:0;background:rgba(10,4,30,.7);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:600px;max-height:92%;overflow:auto;border-radius:26px 26px 0 0;display:grid;gap:14px;padding-top:22px;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.contact{background:var(--sos-soft);border-radius:16px;padding:14px 16px;display:grid;gap:4px}
+.contact b{font-family:var(--f-display);font-size:1.4rem;overflow-wrap:anywhere}
+.num{font-size:1.2rem;font-weight:700;user-select:all;overflow-wrap:anywhere}
+.inner{background:var(--bg);border-radius:16px;padding:14px;display:grid;gap:10px}
+@media (prefers-reduced-motion:reduce){.orb{transition:none !important}.orb.in{transform:scale(.7) !important}.progress>i,.bar-dark>i{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><span>Sigo Firme</span></div>
+    <button id="helpTop" class="sos-pill" type="button">Necesito ayuda</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- INICIO -->
+  <section data-view="inicio" id="v-inicio">
+    <div class="hero">
+      <span class="eyebrow">Llevas sin apostar</span>
+      <div class="days-row"><span class="days" id="days">0</span><span class="days-word" id="daysWord">días</span></div>
+      <p class="sub" id="sinceTxt"></p>
+      <div>
+        <div class="progress" aria-hidden="true"><i id="heroBar"></i></div>
+        <div class="prog-label" style="margin-top:8px"><span id="nextLbl"></span><span id="nextLeft"></span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn light" type="button" data-go="ganas">Tengo ganas ahora</button>
+      </div>
+    </div>
+
+    <div class="quote">
+      <span class="cat" id="qCat"></span>
+      <p class="q" id="qText"></p>
+      <button class="btn ghost" type="button" id="qNext">Otra frase</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat a"><span class="eyebrow">Ganas superadas</span><b id="urges">0</b></div>
+      <div class="stat b"><span class="eyebrow">Dinero que no perdiste</span><b id="saved">—</b></div>
+    </div>
+
+    <div class="card">
+      <h3>Mis logros</h3>
+      <div class="miles" id="miles"></div>
+      <p class="muted" id="mileMsg"></p>
+    </div>
+
+    <div class="card">
+      <h3>Mi meta con este dinero</h3>
+      <div class="two">
+        <div><label for="goalName">¿Qué quiero lograr?</label><input id="goalName" type="text" maxlength="40" placeholder="Ej: Pagar mi deuda"></div>
+        <div><label for="goalCost">Cuánto cuesta (CLP)</label><input id="goalCost" type="number" inputmode="numeric" min="0" step="1000" placeholder="Ej: 300000"></div>
+      </div>
+      <div class="bar-dark" aria-hidden="true"><i id="goalBar"></i></div>
+      <p class="muted" id="goalTxt">Escribe tu meta y cuánto gastabas por semana (más abajo) para ver tu avance.</p>
+    </div>
+
+    <div class="card">
+      <h3>Ajustes</h3>
+      <div><label for="weekly">Lo que gastaba por semana en apuestas (CLP)</label>
+      <input id="weekly" type="number" inputmode="numeric" min="0" step="1000" placeholder="Ej: 30000"></div>
+      <div><label for="startDate">Último día que aposté</label>
+      <input id="startDate" type="date"></div>
+    </div>
+
+    <button class="link" id="relapseBtn" type="button">Tuve una recaída</button>
+    <div class="warn" id="relapseBox" hidden>
+      <p><b>Una recaída no borra lo que avanzaste.</b> Les pasa a muchas personas. Reinicia el contador, cuéntaselo a alguien hoy mismo y vuelve a empezar.</p>
+      <div class="btn-row">
+        <button class="btn primary" type="button" id="relapseReset">Reiniciar a hoy</button>
+        <button class="btn sos" type="button" data-help>Hablar con mi contacto</button>
+        <button class="btn ghost" type="button" id="relapseCancel">Cancelar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GANAS -->
+  <section data-view="ganas" id="v-ganas" hidden>
+    <h2>Las ganas pasan. Quédate 10 minutos.</h2>
+    <div class="urge">
+      <div class="orb-wrap"><div class="orb" id="orb"><span id="orbTxt">Inhala</span></div></div>
+      <div class="timer" id="timer" role="timer" aria-label="Tiempo restante">10:00</div>
+      <div class="btn-row">
+        <button class="btn light" type="button" id="timerGo">Empezar los 10 minutos</button>
+        <button class="btn light" type="button" id="timerReset">Reiniciar</button>
+      </div>
+      <p class="note" id="timerNote" role="status"></p>
+    </div>
+
+    <div class="quote">
+      <span class="cat">Recuerda</span>
+      <p class="deter" id="deter"></p>
+      <button class="btn ghost" type="button" id="nextMsg">Otro mensaje</button>
+    </div>
+
+    <div class="card" id="reasonsCard" hidden>
+      <span class="eyebrow">Por qué lo dejo</span>
+      <ul class="reasons" id="reasonsMini"></ul>
+    </div>
+
+    <div class="card">
+      <h3>Haz algo ahora</h3>
+      <ul class="checks" id="checks"></ul>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Ejercicio 5-4-3-2-1 para calmarte</summary>
+        <div class="form">
+          <p class="muted">Mira a tu alrededor y nombra en voz alta:</p>
+          <ul class="list">
+            <li><b>5</b> cosas que ves</li>
+            <li><b>4</b> cosas que puedes tocar</li>
+            <li><b>3</b> sonidos que oyes</li>
+            <li><b>2</b> olores que sientes</li>
+            <li><b>1</b> sabor en tu boca</li>
+          </ul>
+          <p class="muted">Esto lleva tu mente al presente y baja la ansiedad.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" type="button" id="beat">Ya pasó, superé las ganas</button>
+      <button class="btn sos" type="button" data-help>Sigo con ganas, pedir ayuda</button>
+    </div>
+    <p class="note" id="beatNote" role="status"></p>
+  </section>
+
+  <!-- HERRAMIENTAS -->
+  <section data-view="herramientas" id="v-herramientas" hidden>
+    <h2>Mis herramientas</h2>
+
+    <div class="card">
+      <h3>Plan de emergencia</h3>
+      <p class="muted">Si estás a punto de apostar, sigue estos pasos en orden.</p>
+      <ol class="steps">
+        <li><span><b>Aléjate del dinero y del celular.</b> Deja tarjetas, efectivo y apps de apuestas lejos de ti.</span></li>
+        <li><span><b>Avisa a alguien.</b> Toca "Necesito ayuda" arriba y llama o escribe a tu contacto.</span></li>
+        <li><span><b>Sal de donde estás.</b> Camina, ve donde haya gente o toma aire.</span></li>
+        <li><span><b>Espera 10 minutos.</b> Usa el ejercicio de la pestaña Ganas.</span></li>
+        <li><span><b>Anota qué lo activó.</b> Lo registras en el diario de abajo y aprendes de ello.</span></li>
+      </ol>
+      <div class="btn-row">
+        <button class="btn primary" type="button" data-go="ganas">Ir al ejercicio de ganas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cerrar la puerta</h3>
+      <p class="muted">Cuanto más difícil sea apostar, más fácil es no hacerlo. Marca lo que ya hiciste.</p>
+      <div class="bar-dark" aria-hidden="true"><i id="doorBar"></i></div>
+      <p class="muted" id="doorTxt"></p>
+      <ul class="checks" id="doorList"></ul>
+    </div>
+
+    <div class="card">
+      <h3>Diario: ¿cómo estoy hoy?</h3>
+      <div>
+        <label>Mi ánimo</label>
+        <div class="chips" id="moodChips"></div>
+      </div>
+      <div>
+        <label>Qué me hizo pensar en apostar (si algo)</label>
+        <div class="chips" id="trigChips"></div>
+      </div>
+      <div>
+        <label for="logNote">Nota (opcional)</label>
+        <textarea id="logNote" maxlength="200" placeholder="Algo que quieras recordar de hoy"></textarea>
+      </div>
+      <button class="btn primary" type="button" id="logSave">Guardar en mi diario</button>
+      <p class="note" id="logSaved" role="status"></p>
+      <div class="insight" id="insight" hidden></div>
+      <ul class="entries" id="entries"></ul>
+    </div>
+
+    <div class="card">
+      <h3>Señales de alerta</h3>
+      <p class="muted">Si te reconoces en varias, es momento de pedir ayuda a una persona o a un profesional.</p>
+      <ul class="signs">
+        <li>Pienso en apostar varias veces al día.</li>
+        <li>Apuesto para recuperar lo que perdí.</li>
+        <li>Escondo o miento sobre cuánto gasto.</li>
+        <li>Pido plata prestada para jugar.</li>
+        <li>Me irrito cuando no puedo apostar.</li>
+        <li>Falto al trabajo o a compromisos por apostar.</li>
+        <li>Necesito apostar cada vez más para sentir lo mismo.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Frases para tomar fuerza</h3>
+      <div class="chips" id="phraseCats"></div>
+      <div class="phrase-list" id="phraseList"></div>
+    </div>
+
+    <div class="card">
+      <h3>Ayuda profesional</h3>
+      <ul class="list">
+        <li>Si sientes que puedes hacerte daño: llama al <b>*4141</b> (Chile).</li>
+        <li>Salud Responde: <b>600 360 7777</b>, orientación de salud las 24 horas.</li>
+        <li>Jugadores Anónimos tiene grupos de apoyo gratuitos en Chile.</li>
+        <li>Puedes pedir hora en tu consultorio o centro de salud mental.</li>
+      </ul>
+      <p class="muted">Si estás en otro país, busca la línea de ayuda local. Confirma que los números sigan vigentes.</p>
+    </div>
+  </section>
+
+  <!-- RAZONES -->
+  <section data-view="razones" id="v-razones" hidden>
+    <h2>Mis razones para no apostar</h2>
+    <p class="muted">Escríbelas con tus palabras. Se te mostrarán cuando sientas ganas de jugar.</p>
+    <div class="card">
+      <ul class="reasons" id="reasonsList"></ul>
+      <p class="muted" id="reasonsHint"></p>
+      <div>
+        <label for="reasonIn">Agregar una razón</label>
+        <div class="add-row">
+          <input id="reasonIn" type="text" maxlength="140" placeholder="Ej: Quiero llegar a fin de mes sin deudas">
+          <button class="btn primary" type="button" id="reasonAdd">Agregar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="nav" aria-label="Secciones">
+  <div class="wrap">
+    <button class="navbtn" type="button" data-go="inicio" id="nav-inicio">Inicio</button>
+    <button class="navbtn" type="button" data-go="ganas" id="nav-ganas">Ganas</button>
+    <button class="navbtn" type="button" data-go="herramientas" id="nav-herramientas">Herramientas</button>
+    <button class="navbtn" type="button" data-go="razones" id="nav-razones">Razones</button>
+  </div>
+</nav>
+
+<div class="overlay" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="sheet">
+    <h2 id="sheetTitle">Respira. Pedir ayuda es lo correcto.</h2>
+    <div class="contact">
+      <span class="eyebrow">Tu familiar o persona de confianza</span>
+      <b id="cardName"></b>
+      <span class="num" id="cardPhone"></span>
+    </div>
+
+    <div>
+      <label for="msgText">Mensaje para enviar</label>
+      <textarea id="msgText"></textarea>
+      <div class="chips" id="chips" style="margin-top:8px"></div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn sos" id="callBtn" href="#">Llamar</a>
+      <a class="btn sos" id="smsBtn" href="#">Enviar mensaje</a>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" type="button" id="copyMsg">Copiar mensaje</button>
+      <button class="btn ghost" type="button" id="copyNum">Copiar número</button>
+    </div>
+    <p class="note" id="sheetNote" role="status">Si los botones no abren la llamada o el mensaje en tu teléfono, copia el texto o el número y úsalo desde tu teléfono.</p>
+
+    <details id="contactForm">
+      <summary>Editar contacto</summary>
+      <div class="form">
+        <div><label for="cName">Nombre</label><input id="cName" type="text" maxlength="60" placeholder="Ej: Mamá, mi hermano Pedro"></div>
+        <div><label for="cPhone">Teléfono</label><input id="cPhone" type="tel" inputmode="tel" maxlength="20" placeholder="+56 9 1234 5678"></div>
+        <button class="btn primary" type="button" id="saveContact">Guardar contacto</button>
+      </div>
+    </details>
+
+    <div class="inner">
+      <h3>Mientras esperas su respuesta</h3>
+      <ul class="list">
+        <li>Deja el celular, las tarjetas y el dinero lejos de ti.</li>
+        <li>Sal de la casa o ve a una parte donde haya gente.</li>
+        <li>Tómate un vaso de agua y respira lento durante unos minutos.</li>
+      </ul>
+    </div>
+
+    <div class="inner">
+      <h3>Otras ayudas</h3>
+      <ul class="list">
+        <li>Si sientes que puedes hacerte daño: llama al <b>*4141</b> (Chile).</li>
+        <li>Salud Responde: <b>600 360 7777</b>, orientación de salud las 24 horas.</li>
+        <li>Jugadores Anónimos tiene grupos de apoyo gratuitos en Chile.</li>
+      </ul>
+      <p class="muted">Si estás en otro país, busca la línea de ayuda local. Confirma que los números sigan vigentes.</p>
+    </div>
+
+    <button class="btn ghost" type="button" id="closeSheet">Cerrar</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var KEY='sigofirme.v1', mem=null;
+
+  var PHRASES=[
+    {c:'Fuerza',t:'No tienes que ganarle a las ganas para siempre. Solo a esta hora.'},
+    {c:'Fuerza',t:'Cada vez que esperas, la próxima ola de ganas es más pequeña.'},
+    {c:'Fuerza',t:'Dejar de apostar no te quita diversión. Te devuelve tu vida.'},
+    {c:'Fuerza',t:'Hoy eliges quién vas a ser mañana.'},
+    {c:'Fuerza',t:'Pedir ayuda es cosa de gente valiente.'},
+    {c:'Fuerza',t:'Eres más fuerte que una ficha, una carta o una pantalla.'},
+    {c:'Familia',t:'Tu familia no quiere tu dinero. Te quiere a ti.'},
+    {c:'Familia',t:'Cada día sin apostar es un día que le devuelves a quienes te quieren.'},
+    {c:'Familia',t:'Quienes te aman celebran tus días, no tus cifras.'},
+    {c:'Familia',t:'Contarle a alguien lo que te pasa pesa menos que cargarlo solo.'},
+    {c:'Dinero',t:'La casa siempre gana. Está hecha para eso.'},
+    {c:'Dinero',t:'El dinero que no apuestas hoy sigue siendo tuyo mañana.'},
+    {c:'Dinero',t:'Recuperar lo perdido apostando es la trampa más vieja del juego.'},
+    {c:'Dinero',t:'Una apuesta más nunca es la última si no paras.'},
+    {c:'Dinero',t:'Cada peso que no apuestas puede ser tu tranquilidad.'},
+    {c:'Ganas',t:'Las ganas suben, llegan a su punto máximo y bajan. Siempre bajan.'},
+    {c:'Ganas',t:'Pensar en apostar no es lo mismo que apostar.'},
+    {c:'Ganas',t:'Tu cerebro pide emoción. Dale una caminata, agua y aire.'},
+    {c:'Ganas',t:'Si dudas, espera diez minutos. Casi siempre cambia todo.'},
+    {c:'Ganas',t:'Alejar el celular cinco minutos ya cambia la decisión.'},
+    {c:'Progreso',t:'Un día a la vez es suficiente.'},
+    {c:'Progreso',t:'No empiezas de cero. Empiezas con todo lo que ya aprendiste.'},
+    {c:'Progreso',t:'Una recaída no borra tus días buenos.'},
+    {c:'Progreso',t:'Mira cuánto ya recorriste. Eso también cuenta.'},
+    {c:'Progreso',t:'Cada día sin apostar es una victoria que nadie te puede quitar.'}
+  ];
+  var CATS=['Todas','Fuerza','Familia','Dinero','Ganas','Progreso'];
+  var DETER=[
+    "Las ganas son como una ola: suben, llegan a su punto más alto y bajan. Suelen bajar en menos de media hora.",
+    "La casa siempre gana. Cada juego está hecho para que, a la larga, pierdas más de lo que ganas.",
+    "\"Solo una más\" es la frase que lo reinicia todo. Hoy no la necesitas.",
+    "Si ganas, vas a querer ganar más. Si pierdes, vas a querer recuperarlo. Las dos puertas llevan al mismo lugar.",
+    "Lo que perdiste ya se fue. Apostar para recuperarlo solo lo suma a la cuenta.",
+    "Tu familia prefiere tenerte a ti que a tu dinero.",
+    "No tienes que vencer las ganas para siempre. Solo esta hora.",
+    "Piensa en cómo te sientes al terminar de apostar. Casi nunca es bien.",
+    "Pedir ayuda no es debilidad. Es la decisión más fuerte que puedes tomar hoy.",
+    "Las ganas que no sigues se debilitan. Cada vez que esperas, la próxima es más suave.",
+    "Hablar con alguien ahora vale más que cualquier jugada."
+  ];
+  var CELEBRATE=[
+    "Lo lograste. Eso se llama fuerza de voluntad.",
+    "Una más que superas. Tu cerebro aprende cada vez que esperas.",
+    "Orgulloso de ti. Esta victoria es toda tuya.",
+    "Las ganas pasaron y tú sigues aquí. Eso importa."
+  ];
+  var TEMPLATES=[
+    "Tengo ganas de apostar y necesito hablar contigo ahora. ¿Puedes llamarme?",
+    "Estoy en un momento difícil con el juego. ¿Puedes acompañarme un rato?",
+    "No quiero apostar hoy. Escríbeme o llámame, por favor."
+  ];
+  var ACTIONS=[
+    "Tomar un vaso de agua",
+    "Salir a caminar 10 minutos",
+    "Escribirle o llamar a alguien",
+    "Dejar lejos el celular y el dinero",
+    "Salir de las apps y páginas de apuestas",
+    "Lavarme la cara o ducharme"
+  ];
+  var DEFAULT_REASONS=[
+    "Quiero recuperar la confianza de mi familia.",
+    "Quiero dejar de deber plata.",
+    "Quiero dormir tranquilo."
+  ];
+  var MILES=[
+    {d:1,t:'1 día',m:'Primer día. Lo más difícil es empezar y ya lo hiciste.'},
+    {d:3,t:'3 días',m:'Tres días. Lo peor de las ganas intensas suele ir bajando.'},
+    {d:7,t:'1 semana',m:'Una semana entera sin apostar. Es un gran paso.'},
+    {d:14,t:'2 semanas',m:'Dos semanas. Tu cuerpo y tu mente ya notan el cambio.'},
+    {d:30,t:'1 mes',m:'Un mes. Estás armando una vida nueva.'},
+    {d:60,t:'2 meses',m:'Dos meses. Mucha gente no llega hasta aquí.'},
+    {d:90,t:'3 meses',m:'Tres meses. Esto ya es un hábito nuevo.'},
+    {d:180,t:'6 meses',m:'Medio año. Mira todo lo que has recuperado.'},
+    {d:365,t:'1 año',m:'Un año completo. Eres prueba de que se puede.'}
+  ];
+  var DOOR=[
+    "Borré las apps de apuestas y casinos del celular",
+    "Me autoexcluí de las plataformas donde jugaba",
+    "Instalé un bloqueador de sitios de apuestas",
+    "Entregué mis tarjetas o mi clave bancaria a alguien de confianza",
+    "Puse un límite diario en mi banco",
+    "Le conté a mi familia o a alguien cercano",
+    "Quité las notificaciones y correos de casas de apuestas"
+  ];
+  var MOODS=['Bien','Normal','Ansioso','Triste','Con ganas de apostar'];
+  var TRIGS=['Aburrimiento','Estrés','Día de pago','Discusión','Solo en casa','Alcohol','Publicidad o apps','Deporte en TV','Dinero justo'];
+
+  function pad(n){return n<10?'0'+n:''+n}
+  function todayStr(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+  function parseDate(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+  function daysSince(s){return Math.max(0,Math.round((parseDate(todayStr())-parseDate(s))/864e5))}
+  function fmtDate(s){return parseDate(s).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})}
+  function fmtShort(s){return parseDate(s).toLocaleDateString('es-CL',{day:'numeric',month:'short'})}
+  function money(n){
+    try{return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n)}
+    catch(e){return '$'+Math.round(n)}
+  }
+  function dayOfYear(){var n=new Date();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)}
+
+  function load(){
+    try{var r=localStorage.getItem(KEY); if(r) return JSON.parse(r)}catch(e){}
+    return mem||{};
+  }
+  var S=Object.assign({start:todayStr(),weekly:0,urges:0,contact:{name:'',phone:''},reasons:null,msg:null,goalName:'',goalCost:0,door:{},log:[]},load());
+  if(!S.contact) S.contact={name:'',phone:''};
+  if(!S.door) S.door={};
+  if(!Array.isArray(S.log)) S.log=[];
+  function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+  /* ---------- Inicio ---------- */
+  var qIdx=dayOfYear()%PHRASES.length;
+  function showQuote(){var p=PHRASES[qIdx%PHRASES.length];$('qCat').textContent=p.c;$('qText').textContent=p.t}
+  $('qNext').addEventListener('click',function(){qIdx++;showQuote()});
+
+  function savedAmount(){return S.weekly>0?Math.round(S.weekly*daysSince(S.start)/7):0}
+
+  function renderHome(){
+    var d=daysSince(S.start);
+    $('days').textContent=d;
+    $('daysWord').textContent=d===1?'día':'días';
+    $('sinceTxt').textContent=d===0?'Hoy es tu día 1. Empezar es lo más difícil y ya lo hiciste.':'Desde el '+fmtDate(S.start)+'.';
+    $('startDate').value=S.start;$('startDate').max=todayStr();
+    $('urges').textContent=S.urges;
+    $('weekly').value=S.weekly||'';
+    $('saved').textContent=S.weekly>0?money(savedAmount()):'—';
+
+    var prev=0,next=null,last=null;
+    MILES.forEach(function(m){if(d>=m.d){last=m;prev=m.d}else if(!next){next=m}});
+    if(next){
+      var pct=Math.max(4,Math.min(100,((d-prev)/(next.d-prev))*100));
+      $('heroBar').style.width=pct+'%';
+      $('nextLbl').textContent='Próximo logro: '+next.t;
+      var left=next.d-d;$('nextLeft').textContent='faltan '+left+(left===1?' día':' días');
+    }else{
+      $('heroBar').style.width='100%';$('nextLbl').textContent='Lo lograste todo';$('nextLeft').textContent='';
+    }
+    var wrap=$('miles');wrap.textContent='';
+    MILES.forEach(function(m){
+      var s=document.createElement('span');s.className='mile'+(d>=m.d?' on':'');s.textContent=m.t;wrap.appendChild(s);
+    });
+    $('mileMsg').textContent=last?last.m:'Tu primer logro es 1 día. Estás muy cerca.';
+
+    $('goalName').value=S.goalName||'';$('goalCost').value=S.goalCost||'';
+    renderGoal();
+  }
+  function renderGoal(){
+    var cost=S.goalCost||0,sv=savedAmount(),name=S.goalName||'tu meta';
+    if(cost>0&&S.weekly>0){
+      var pct=Math.min(100,Math.round(sv/cost*100));
+      $('goalBar').style.width=pct+'%';
+      $('goalTxt').textContent=pct>=100?'Ya reuniste el dinero para '+name+'. Es tuyo.':'Llevas '+pct+'% para '+name+' ('+money(sv)+' de '+money(cost)+').';
+    }else{
+      $('goalBar').style.width='0';
+      $('goalTxt').textContent='Escribe tu meta y cuánto gastabas por semana (en Ajustes) para ver tu avance.';
+    }
+  }
+  $('startDate').addEventListener('change',function(){var v=this.value;if(v&&v<=todayStr()){S.start=v;save();renderHome()}});
+  $('weekly').addEventListener('input',function(){S.weekly=Math.max(0,parseInt(this.value,10)||0);save();$('saved').textContent=S.weekly>0?money(savedAmount()):'—';renderGoal()});
+  $('goalName').addEventListener('input',function(){S.goalName=this.value.trim();save();renderGoal()});
+  $('goalCost').addEventListener('input',function(){S.goalCost=Math.max(0,parseInt(this.value,10)||0);save();renderGoal()});
+  $('relapseBtn').addEventListener('click',function(){$('relapseBox').hidden=false;this.hidden=true});
+  $('relapseCancel').addEventListener('click',function(){$('relapseBox').hidden=true;$('relapseBtn').hidden=false});
+  $('relapseReset').addEventListener('click',function(){S.start=todayStr();save();renderHome();$('relapseBox').hidden=true;$('relapseBtn').hidden=false});
+
+  /* ---------- Ganas ---------- */
+  var breathTimer=null,phaseIn=false,rotator=null,msgIdx=0;
+  function breathe(){
+    phaseIn=!phaseIn;
+    var orb=$('orb');
+    orb.style.transitionDuration=(phaseIn?4:6)+'s';
+    orb.classList.toggle('in',phaseIn);
+    $('orbTxt').textContent=phaseIn?'Inhala':'Exhala';
+    breathTimer=setTimeout(breathe,phaseIn?4000:6000);
+  }
+  function showMsg(){$('deter').textContent=DETER[msgIdx%DETER.length]}
+  function startGanas(){
+    msgIdx=Math.floor(Math.random()*DETER.length);showMsg();
+    if(!breathTimer){phaseIn=false;breathe()}
+    if(!rotator){rotator=setInterval(function(){msgIdx++;showMsg()},15000)}
+    renderMiniReasons();
+  }
+  function stopGanas(){clearTimeout(breathTimer);breathTimer=null;clearInterval(rotator);rotator=null}
+  $('nextMsg').addEventListener('click',function(){msgIdx++;showMsg()});
+
+  var TOTAL=600,remain=TOTAL,endAt=0,tick=null;
+  function drawTimer(){$('timer').textContent=pad(Math.floor(remain/60))+':'+pad(remain%60)}
+  function stopTimer(){clearInterval(tick);tick=null}
+  $('timerGo').addEventListener('click',function(){
+    if(tick){stopTimer();this.textContent='Seguir con los 10 minutos';return}
+    if(remain<=0) remain=TOTAL;
+    $('timerNote').textContent='';
+    endAt=Date.now()+remain*1000;
+    this.textContent='Pausar';
+    tick=setInterval(function(){
+      remain=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+      drawTimer();
+      if(remain<=0){
+        stopTimer();$('timerGo').textContent='Empezar de nuevo';
+        $('timerNote').textContent='Pasaron los 10 minutos. Revisa cómo estás: si las ganas bajaron, marca que las superaste. Si siguen, pide ayuda.';
+      }
+    },250);
+  });
+  $('timerReset').addEventListener('click',function(){
+    stopTimer();remain=TOTAL;drawTimer();
+    $('timerGo').textContent='Empezar los 10 minutos';$('timerNote').textContent='';
+  });
+  var checksEl=$('checks');
+  ACTIONS.forEach(function(a,i){
+    var li=document.createElement('li'),lb=document.createElement('label'),cb=document.createElement('input');
+    cb.type='checkbox';cb.id='act'+i;
+    var sp=document.createElement('span');sp.textContent=a;
+    lb.appendChild(cb);lb.appendChild(sp);li.appendChild(lb);checksEl.appendChild(li);
+  });
+  $('beat').addEventListener('click',function(){
+    S.urges++;save();
+    stopTimer();remain=TOTAL;drawTimer();
+    $('timerGo').textContent='Empezar los 10 minutos';$('timerNote').textContent='';
+    Array.prototype.forEach.call(checksEl.querySelectorAll('input'),function(c){c.checked=false});
+    $('beatNote').textContent=CELEBRATE[S.urges%CELEBRATE.length]+' Llevas '+S.urges+(S.urges===1?' ganas superada.':' ganas superadas.');
+    renderHome();
+  });
+
+  /* ---------- Razones ---------- */
+  function currentReasons(){return S.reasons===null?DEFAULT_REASONS.slice():S.reasons}
+  function fillList(ul,list,removable){
+    ul.textContent='';
+    list.forEach(function(r,i){
+      var li=document.createElement('li'),sp=document.createElement('span');
+      sp.textContent=r;li.appendChild(sp);
+      if(removable){
+        var b=document.createElement('button');b.type='button';b.textContent='Quitar';
+        b.setAttribute('aria-label','Quitar la razón: '+r);
+        b.addEventListener('click',function(){var arr=currentReasons();arr.splice(i,1);S.reasons=arr;save();renderReasons()});
+        li.appendChild(b);
+      }
+      ul.appendChild(li);
+    });
+  }
+  function renderReasons(){
+    fillList($('reasonsList'),currentReasons(),true);
+    $('reasonsHint').textContent=S.reasons===null?'Estas tres son de ejemplo. Quítalas y escribe las tuyas.':(S.reasons.length?'':'Aún no tienes razones guardadas. Agrega la primera.');
+  }
+  function renderMiniReasons(){
+    var show=S.reasons!==null&&S.reasons.length>0;
+    $('reasonsCard').hidden=!show;
+    if(show) fillList($('reasonsMini'),S.reasons.slice(0,3),false);
+  }
+  function addReason(){
+    var v=$('reasonIn').value.trim();if(!v)return;
+    var arr=currentReasons();arr.push(v);S.reasons=arr;save();$('reasonIn').value='';renderReasons();
+  }
+  $('reasonAdd').addEventListener('click',addReason);
+  $('reasonIn').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addReason()}});
+
+  /* ---------- Herramientas ---------- */
+  function renderDoor(){
+    var ul=$('doorList');ul.textContent='';var n=0;
+    DOOR.forEach(function(t,i){
+      var done=!!S.door[i];if(done)n++;
+      var li=document.createElement('li'),lb=document.createElement('label'),cb=document.createElement('input');
+      cb.type='checkbox';cb.id='door'+i;cb.checked=done;
+      cb.addEventListener('change',function(){S.door[i]=cb.checked;save();renderDoor()});
+      var sp=document.createElement('span');sp.textContent=t;
+      lb.appendChild(cb);lb.appendChild(sp);li.appendChild(lb);ul.appendChild(li);
+    });
+    $('doorBar').style.width=Math.round(n/DOOR.length*100)+'%';
+    $('doorTxt').textContent=n===DOOR.length?'Cerraste todas las puertas. Excelente.':n+' de '+DOOR.length+' puertas cerradas.';
+  }
+
+  var curMood='',curTrig={};
+  function chipSet(el,items,single,get,set){
+    el.textContent='';
+    items.forEach(function(t){
+      var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;
+      b.setAttribute('aria-pressed',get(t)?'true':'false');
+      b.addEventListener('click',function(){set(t);chipSet(el,items,single,get,set)});
+      el.appendChild(b);
+    });
+  }
+  function renderChips(){
+    chipSet($('moodChips'),MOODS,true,function(t){return curMood===t},function(t){curMood=curMood===t?'':t});
+    chipSet($('trigChips'),TRIGS,false,function(t){return !!curTrig[t]},function(t){curTrig[t]=!curTrig[t]});
+  }
+  function renderLog(){
+    var ul=$('entries');ul.textContent='';
+    var counts={};
+    S.log.forEach(function(e){(e.triggers||[]).forEach(function(t){counts[t]=(counts[t]||0)+1})});
+    var top=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]}).slice(0,3);
+    var ins=$('insight');
+    if(top.length){
+      ins.hidden=false;
+      ins.textContent='Lo que más te activa: '+top.map(function(t){return t+' ('+counts[t]+')'}).join(', ')+'. Piensa en un plan para esos momentos.';
+    }else ins.hidden=true;
+    S.log.slice(0,6).forEach(function(e,i){
+      var li=document.createElement('li'),row=document.createElement('div');row.className='row';
+      var h=document.createElement('b');h.textContent=fmtShort(e.d)+(e.mood?' · '+e.mood:'');
+      var del=document.createElement('button');del.type='button';del.textContent='Quitar';
+      del.setAttribute('aria-label','Quitar la entrada del '+fmtShort(e.d));
+      del.addEventListener('click',function(){S.log.splice(i,1);save();renderLog()});
+      row.appendChild(h);row.appendChild(del);li.appendChild(row);
+      if(e.triggers&&e.triggers.length){var p=document.createElement('span');p.className='muted';p.textContent=e.triggers.join(', ');li.appendChild(p)}
+      if(e.note){var n=document.createElement('span');n.textContent=e.note;li.appendChild(n)}
+      ul.appendChild(li);
+    });
+  }
+  $('logSave').addEventListener('click',function(){
+    var trig=Object.keys(curTrig).filter(function(k){return curTrig[k]});
+    var note=$('logNote').value.trim();
+    if(!curMood&&!trig.length&&!note){$('logSaved').textContent='Elige tu ánimo o escribe algo antes de guardar.';return}
+    S.log.unshift({d:todayStr(),mood:curMood,triggers:trig,note:note});
+    if(S.log.length>60) S.log.length=60;
+    save();curMood='';curTrig={};$('logNote').value='';renderChips();renderLog();
+    $('logSaved').textContent='Guardado. Anotar lo que sientes ya te ayuda.';
+  });
+
+  var phraseCat='Todas';
+  function renderPhrases(){
+    chipSet($('phraseCats'),CATS,true,function(t){return phraseCat===t},function(t){phraseCat=t});
+    var list=$('phraseList');list.textContent='';
+    PHRASES.filter(function(p){return phraseCat==='Todas'||p.c===phraseCat}).forEach(function(p){
+      var d=document.createElement('div');d.className='phrase-item';d.textContent=p.t;list.appendChild(d);
+    });
+  }
+  var _setCat=function(){};
+  $('phraseCats').addEventListener('click',function(){renderPhrases()});
+
+  /* ---------- Hoja de ayuda ---------- */
+  var lastFocus=null;
+  function cleanPhone(p){var t=(p||'').trim();return (t.charAt(0)==='+'?'+':'')+t.replace(/\D/g,'')}
+  function updateLinks(){
+    var c=S.contact,has=!!c.phone;
+    $('callBtn').hidden=!has;$('smsBtn').hidden=!has;$('copyNum').hidden=!has;
+    if(has){
+      $('callBtn').href='tel:'+c.phone;
+      $('smsBtn').href='sms:'+c.phone+'?&body='+encodeURIComponent($('msgText').value);
+    }
+  }
+  function renderSheet(){
+    var c=S.contact;
+    $('cardName').textContent=c.name||'Aún no guardaste a nadie';
+    $('cardPhone').textContent=c.phone||'Agrega un teléfono para llamar con un toque.';
+    $('cName').value=c.name||'';$('cPhone').value=c.phone||'';
+    $('contactForm').open=!c.phone;
+    $('msgText').value=S.msg||TEMPLATES[0];
+    updateLinks();
+  }
+  function openSheet(){
+    lastFocus=document.activeElement;renderSheet();
+    $('sheetNote').textContent='Si los botones no abren la llamada o el mensaje en tu teléfono, copia el texto o el número y úsalo desde tu teléfono.';
+    $('sheet').hidden=false;$('closeSheet').focus();
+  }
+  function closeSheet(){$('sheet').hidden=true;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-help]'),function(b){b.addEventListener('click',openSheet)});
+  $('helpTop').addEventListener('click',openSheet);
+  $('closeSheet').addEventListener('click',closeSheet);
+  $('sheet').addEventListener('click',function(e){if(e.target===this)closeSheet()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+
+  var chips=$('chips');
+  TEMPLATES.forEach(function(t){
+    var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;
+    b.addEventListener('click',function(){$('msgText').value=t;S.msg=t;save();updateLinks()});
+    chips.appendChild(b);
+  });
+  $('msgText').addEventListener('input',function(){S.msg=this.value;save();updateLinks()});
+  $('saveContact').addEventListener('click',function(){
+    S.contact={name:$('cName').value.trim(),phone:cleanPhone($('cPhone').value)};save();
+    renderSheet();$('sheetNote').textContent=S.contact.phone?'Contacto guardado en este teléfono.':'Escribe un teléfono para guardarlo.';
+  });
+  function copyFrom(text,el){
+    var done=function(){$('sheetNote').textContent='Copiado.'};
+    var fail=function(){
+      try{
+        if(el.select){el.focus();el.select()}
+        else{var r=document.createRange();r.selectNodeContents(el);var sel=getSelection();sel.removeAllRanges();sel.addRange(r)}
+      }catch(e){}
+      $('sheetNote').textContent='No se pudo copiar solo. El texto quedó seleccionado: cópialo a mano.';
+    };
+    try{navigator.clipboard.writeText(text).then(done,fail)}catch(e){fail()}
+  }
+  $('copyMsg').addEventListener('click',function(){copyFrom($('msgText').value,$('msgText'))});
+  $('copyNum').addEventListener('click',function(){copyFrom(S.contact.phone,$('cardPhone'))});
+
+  /* ---------- Navegación por hash ---------- */
+  var VIEWS=['inicio','ganas','herramientas','razones'];
+  function show(name){
+    VIEWS.forEach(function(v){
+      $('v-'+v).hidden=(v!==name);
+      var n=$('nav-'+v);
+      if(v===name)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current');
+    });
+    if(name==='ganas')startGanas();else stopGanas();
+    if(name==='inicio')renderHome();
+    if(name==='razones')renderReasons();
+    if(name==='herramientas'){renderDoor();renderChips();renderLog();renderPhrases()}
+    window.scrollTo(0,0);
+  }
+  function route(){var h=location.hash.slice(1);show(VIEWS.indexOf(h)>=0?h:'inicio')}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go]'),function(b){
+    b.addEventListener('click',function(){
+      var t=b.getAttribute('data-go');
+      if(location.hash==='#'+t)route();else location.hash=t;
+    });
+  });
+  window.addEventListener('hashchange',route);
+
+  drawTimer();showQuote();renderHome();route();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+  }
+})();
+</script>
+</body>
+</html>

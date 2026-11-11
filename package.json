@@ -1,0 +1,11 @@
+{
+  "name": "sigo-firme",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.mjs",
+    "probar": "DRY_RUN=1 API_TOKEN=clave-de-prueba-123 node server.mjs"
+  }
+}
